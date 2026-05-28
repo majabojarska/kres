@@ -54,7 +54,7 @@ func (lint *Gofumpt) CompileMakefile(output *makefile.Output) error {
 		output.Target("fmt").Description("Formats the source code").
 			Phony().
 			Script(
-				`@docker run --rm -it -v $(PWD):/src -w /src golang:$(GO_VERSION) \
+				`@docker run --rm -v $(PWD):/src -w /src golang:$(GO_VERSION) \
 	bash -c "export GOTOOLCHAIN=local; \
 	export GO111MODULE=on; export GOPROXY=https://proxy.golang.org; \
 	go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION) && \

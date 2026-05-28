@@ -22,6 +22,7 @@ import (
 	"github.com/siderolabs/kres/internal/output/license"
 	"github.com/siderolabs/kres/internal/output/makefile"
 	"github.com/siderolabs/kres/internal/output/markdownlint"
+	"github.com/siderolabs/kres/internal/output/precommit"
 	"github.com/siderolabs/kres/internal/output/release"
 	"github.com/siderolabs/kres/internal/output/renovate"
 	"github.com/siderolabs/kres/internal/output/sops"
@@ -76,6 +77,7 @@ func runGen() error {
 		output.Wrap(sops.NewOutput()),
 		output.Wrap(renovate.NewOutput()),
 		output.Wrap(conform.NewOutput()),
+		output.Wrap(precommit.NewOutput()),
 	}
 
 	if !options.CompileGithubWorkflowsOnly {

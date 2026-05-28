@@ -21,6 +21,7 @@ import (
 	"github.com/siderolabs/kres/internal/output/conform"
 	"github.com/siderolabs/kres/internal/output/conform/licensepolicy"
 	"github.com/siderolabs/kres/internal/output/license"
+	"github.com/siderolabs/kres/internal/output/precommit"
 	"github.com/siderolabs/kres/internal/project/meta"
 )
 
@@ -65,6 +66,8 @@ type Repository struct { //nolint:govet
 	BotName string `yaml:"botName"`
 
 	SkipStaleWorkflow bool `yaml:"skipStaleWorkflow"`
+
+	EnablePreCommit bool `yaml:"enablePreCommit"`
 }
 
 // LicenseConfig configures the license.
@@ -114,6 +117,8 @@ func NewRepository(meta *meta.Options) *Repository {
 		},
 
 		BotName: "talos-bot",
+
+		EnablePreCommit: true,
 	}
 }
 
@@ -121,6 +126,38 @@ func NewRepository(meta *meta.Options) *Repository {
 func (r *Repository) AfterLoad() error {
 	r.meta.MainBranch = r.MainBranch
 	r.meta.SkipStaleWorkflow = r.SkipStaleWorkflow
+
+	return nil
+}
+
+// CompilePreCommit implements precommit.Compiler.
+func (r *Repository) CompilePreCommit(o *precommit.Output) error {
+	if !r.EnablePreCommit {
+		return nil
+	}
+
+	o.Enable()
+	o.SetDefaultInstallHookTypes([]string{"pre-commit", "commit-msg"})
+
+	repo := o.Repo("local")
+	repo.Hook("fmt").
+		WithName("fmt").
+		WithEntry("make fmt").
+		WithLanguage("system").
+		WithStages("pre-commit").
+		WithPassFilenames(false)
+	repo.Hook("lint").
+		WithName("lint").
+		WithEntry("make lint").
+		WithLanguage("system").
+		WithStages("pre-commit").
+		WithPassFilenames(false)
+	repo.Hook("conformance").
+		WithName("conformance").
+		WithEntry("make conformance").
+		WithLanguage("system").
+		WithStages("commit-msg").
+		WithPassFilenames(false)
 
 	return nil
 }

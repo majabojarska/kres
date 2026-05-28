@@ -39,7 +39,7 @@ func (conformance *Conformance) CompileMakefile(output *makefile.Output) error {
 
 	output.Target(conformance.Name()).
 		Script("@docker pull $(" + conformanceImageEnvVarName + ")").
-		Script("@docker run --rm -it -v $(PWD):/src -w /src $(" + conformanceImageEnvVarName + ") enforce").
+		Script("@docker run --rm -v $(PWD):/src -w /src $(" + conformanceImageEnvVarName + ") enforce").
 		Phony()
 
 	return nil
